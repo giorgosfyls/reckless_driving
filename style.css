@@ -1,0 +1,295 @@
+/* ---------------------------------------------------------------
+  GLOBAL THEME DESIGN SYSTEM VARIABLES
+  ---------------------------------------------------------------
+  Declares the primary color tokens, hex codes, and rendering properties 
+  shared uniformly across the canvas game components.
+*/
+:root{
+  --page-bg:#3C3E72;
+  --page-bg-dark:#2A2C52;
+  --card-bg:#EDEAE0;
+  --card-edge:#D8D3C2;
+  --banner-top:#78B0FF;
+  --banner-bottom:#2E6FE0;
+  --asphalt:#8D8F95;
+  --asphalt-edge:#7A7C82;
+  --lane-line:#F2F0E8;
+  --grass:#6E9142;
+  --grass-dark:#557331;
+  --grass-light:#86AE55;
+  --red-car:#D64B3F;
+  --red-car-dark:#A1332A;
+  --truck-cab:#C23B32;
+  --truck-trailer:#F2EEE2;
+  --player-car:#F5F2E8;
+  --player-car-dark:#C9C4B2;
+  --window:#2B2D45;
+  --ink:#2A2C40;
+  --ink-soft:#6A6C86;
+  --warn:#FFC94D;
+  --danger:#D6453F;
+  --success:#5AA463;
+  --radius:14px;
+}
+
+*{box-sizing:border-box;}
+
+/* ---------------------------------------------------------------
+  BODY LAYOUT MATRIX
+  ---------------------------------------------------------------
+  Centers the application card viewport right in the middle of the screen. 
+  Applies an immersive layout wrapper.
+*/
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at 25% 10%, var(--page-bg) 0%, var(--page-bg-dark) 75%);
+  font-family:'VT323',monospace;
+  color:var(--ink);
+  padding:0; /* Stripped default desktop padding to let mobile fill seamlessly */
+}
+
+.pixel{
+  font-family:'Press Start 2P', monospace;
+}
+
+/* ---------------------------------------------------------------
+  MOBILE FIRST FULL-SCREEN DEFAULT SETUP
+  ---------------------------------------------------------------
+  By default, the card behaves as a full-screen mobile app stretching 
+  across 100% width and height for optimal handheld play.
+*/
+.captcha-card{
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  background: var(--card-bg);
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card-body{
+  padding: 10px;
+  flex: 1;
+  min-height: 0; /* stops this flex item from being forced taller than its container */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ---------------------------------------------------------------
+  CANVAS ROAD VIEWPORT CONTAINER
+  ---------------------------------------------------------------
+  Forces the internal aspect ratio to stretch and align into our flex layout, 
+  ensuring it fits nicely on vertical smartphone aspect ratios.
+*/
+.road-wrap{
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid #D8D3C2;
+  outline: 3px solid var(--page-bg-dark);
+  outline-offset: 0;
+  line-height: 0;
+  flex: 1;
+  min-height: 0; /* lets this flex item shrink to the space card-body actually has, instead of
+                    being sized off the canvas's content */
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------
+  ANTI-ALIASING PIXEL ART ENHANCEMENTS
+  ---------------------------------------------------------------
+  Disables texture filtering. This lets the tiny internal drawing engine 
+  scale up cleanly to match its parent card dimensions while keeping 
+  retro block textures crisp instead of muddy or blurred.
+*/
+canvas{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; 
+  touch-action: none;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ---------------------------------------------------------------
+  DESKTOP VIEWPORT MEDIA QUERY (WIDTHS ABOVE 768PX)
+  ---------------------------------------------------------------
+  When loaded on a PC or tablet, it scales back down into a standalone 
+  security verification widget floating over the space background.
+*/
+@media (min-width: 769px) {
+  body {
+    padding: 24px 14px;
+  }
+  .captcha-card {
+    width: 440px; 
+    height: 720px;
+    max-width: 440px;
+    border: 4px solid var(--page-bg-dark);
+    border-radius: 18px;
+    box-shadow: 0 10px 0 rgba(0,0,0,0.18), 0 20px 40px -14px rgba(0,0,0,0.45);
+  }
+}
+
+/* ---------------------------------------------------------------
+  UI TEXT LABELS & HEADERS
+  ---------------------------------------------------------------
+*/
+.banner{
+  background:linear-gradient(180deg, var(--banner-top) 0%, var(--banner-bottom) 100%);
+  padding:12px 18px;
+  border-bottom:3px solid var(--page-bg-dark);
+}
+.banner-small{
+  font-size:11px;
+  color:#EAF2FF;
+  margin:0 0 4px;
+  letter-spacing:.5px;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.2);
+}
+.banner-big{
+  font-size:21px;
+  color:#FFFFFF;
+  margin:0;
+  line-height:1.2;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.25);
+}
+
+/* ---------------------------------------------------------------
+  MENU OVERLAYS (START / GAME OVER SCREENS)
+  ---------------------------------------------------------------
+*/
+.overlay{
+  position:absolute;inset:0;
+  background:rgba(30,30,50,0.78);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:18px;
+  color:#fff;
+  transition:opacity .2s ease;
+  z-index: 10;
+}
+.overlay.hidden{opacity:0;pointer-events:none;}
+.overlay h2{
+  font-family:'Press Start 2P',monospace;
+  margin:0 0 10px;
+  font-size:15px;
+  line-height:1.5;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.3);
+}
+.overlay p{
+  margin:0 0 16px;
+  font-size:16px;
+  color:#E4E6F2;
+  max-width:250px;
+  line-height:1.4;
+  font-family:'VT323',monospace;
+}
+.verify-btn{
+  font-family:'Press Start 2P',monospace;
+  font-size:11px;
+  color:#fff;
+  background:var(--banner-bottom);
+  border:none;
+  border-bottom:4px solid #1E4FA8;
+  padding:12px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:transform .08s ease;
+}
+.verify-btn:active{transform:translateY(3px);border-bottom-width:1px;}
+
+/* ---------------------------------------------------------------
+  SCORE DISPLAY COMPONENT STYLING
+  ---------------------------------------------------------------
+*/
+.stats-row{
+  display:flex;
+  gap:10px;
+  margin-top:8px;
+}
+.stat{
+  flex:1 1 0;
+  background:#FFFDF8;
+  border:2px solid var(--card-edge);
+  border-radius:8px;
+  padding:4px 10px;
+  text-align:center;
+}
+.stat-label{
+  display:block;
+  font-family:'Press Start 2P',monospace;
+  font-size:8px;
+  letter-spacing:.5px;
+  color:var(--ink-soft);
+  margin-bottom:2px;
+}
+.stat-value{
+  display:block;
+  font-family:'Press Start 2P',monospace;
+  font-size:14px;
+  color:var(--ink);
+}
+
+/* ---------------------------------------------------------------
+  MOBILE CONTROLS OVERLAY INTERFACE
+  ---------------------------------------------------------------
+*/
+.controls-track{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin:8px 0 4px;
+  background:#DFDACB;
+  border:2px solid var(--card-edge);
+  border-radius:30px;
+  padding:6px;
+}
+.arrow-btn{
+  width:48px;height:48px;
+  border-radius:50%;
+  border:none;
+  border-bottom:4px solid #1E4FA8;
+  background:var(--banner-bottom);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .08s ease;
+  flex:0 0 auto;
+}
+.arrow-btn svg{width:22px;height:22px;}
+.arrow-btn:active{transform:translateY(3px);border-bottom-width:1px;}
+
+/* ---------------------------------------------------------------
+  WIDGET FOOTER SIGNATURE
+  ---------------------------------------------------------------
+*/
+.captcha-footer{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 4px 2px;
+}
+.footer-fine{
+  font-family:'VT323',monospace;
+  font-size:14px;
+  color:#96917E;
+  text-align:center;
+  line-height:1.25;
+}
