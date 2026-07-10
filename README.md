@@ -2,6 +2,11 @@
 
 A CAPTCHA-style verification widget that replaces "click the traffic lights" with a tiny playable driving game. The user steers a car left/right with arrow buttons (or ← → / A / D keys) to dodge oncoming traffic on a canvas-rendered highway. Surviving a short distance / crashing at least once is treated as proof of human reflexes rather than a click.
 
+## Links
+
+- 📂 Source Code: https://github.com/username/project
+- 🌐 Live Demo: [https://project-demo.com](https://giorgosfyls.github.io/reckless_driving/)
+
 ## Files
 
 | File | Purpose |
@@ -28,11 +33,6 @@ A CAPTCHA-style verification widget that replaces "click the traffic lights" wit
 - No server-side verification — this is a front-end game only; wiring up a pass/fail signal to a backend is a follow-up.
 - No accessible/non-visual fallback for users who can't play a reflex game.
 - Lane count is fixed per device class (4 mobile / 5 desktop) rather than fully responsive.
-
-## Links
-
-- 📂 Source Code: https://github.com/username/project
-- 🌐 Live Demo: https://project-demo.com
 
 ## Coming soon
 
