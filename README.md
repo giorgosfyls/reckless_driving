@@ -29,6 +29,11 @@ A CAPTCHA-style verification widget that replaces "click the traffic lights" wit
 - No accessible/non-visual fallback for users who can't play a reflex game.
 - Lane count is fixed per device class (4 mobile / 5 desktop) rather than fully responsive.
 
+## Links
+
+- 📂 Source Code: https://github.com/username/project
+- 🌐 Live Demo: https://project-demo.com
+
 ## Coming soon
 
 Updates are on the way — stay tuned.
