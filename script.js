@@ -2,41 +2,55 @@
   "use strict";
 
   // ---------------------------------------------------------------
-  // MOBILE VS DESKTOP DYNAMIC GEOMETRY SETUP
+  // 1. FULLY DYNAMIC & RESPONSIVE LANE CALCULATION
   // ---------------------------------------------------------------
-  // Checks if the window viewport falls under mobile form factors (<= 768px wide)
-  const isMobile = window.innerWidth <= 768;
-
-  // As requested: locks onto 4 lanes for smartphones, expands to 5 lanes on PC desktops
-  const LANES = isMobile ? 4 : 5;
-
-
-  // ---------------------------------------------------------------
-  // CANVAS DRAWING BOUNDARIES SETUP
-  // ---------------------------------------------------------------
-  // Accesses the DOM canvas. Disables anti-aliasing to make pixel boundaries blocky.
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
 
-  // Internal resolution width (PW) adjusts dynamically to fit the lane count
-  const PW = isMobile ? 168 : 210; 
+  // Track lanes and viewport geometry dynamically
+  let LANES = 4;
+  let PW = 168; // Will be calculated dynamically: LANES * 42
   const PH = 250;
+  let SHOULDER = 12; // Width of the green grass shoulder buffer on both highway edges
+  let LANE_AREA_W = PW - SHOULDER * 2; // Total width of the active roadway lanes
+  let LANE_W = LANE_AREA_W / LANES; // Width allocated per individual lane
 
-  canvas.width = PW;
-  canvas.height = PH;
-
-
-  // ---------------------------------------------------------------
-  // ROAD / LANE COORD CALCULATORS
-  // ---------------------------------------------------------------
-  const SHOULDER = 12; // Grass buffer thickness on the edges
-  const LANE_AREA_W = PW - SHOULDER * 2; // Real roadway width area
-  const LANE_W = LANE_AREA_W / LANES; // Step allocation per lane matching viewport
-
-  // Finds the center X coordinate of any specific lane index
+  // Calculates the horizontal center coordinate for a specific lane index
   function laneCenterX(lane){
     return SHOULDER + LANE_W * lane + LANE_W / 2;
+  }
+
+  // Recalculates game board geometry, lanes, and updates player position based on window viewport
+  function resizeCanvas() {
+    const width = window.innerWidth;
+
+    // Apply custom breakpoints requested for lane configurations
+    if (width < 375) {
+      LANES = 3;
+    } else if (width >= 375 && width <= 768) {
+      LANES = 4;
+    } else if (width > 768 && width <= 1440) {
+      LANES = 5;
+    } else {
+      LANES = 6;
+    }
+
+    // Set crisp internal rendering resolutions to match computed lanes dynamically
+    PW = LANES * 42; 
+    canvas.width = PW;
+    canvas.height = PH;
+
+    // Re-evaluate road layout metrics
+    LANE_AREA_W = PW - SHOULDER * 2;
+    LANE_W = LANE_AREA_W / LANES;
+
+    // Reposition player to the center lane if the game has not started yet
+    if (state === 'start' && player) {
+      player.lane = Math.floor(LANES / 2) - 1;
+      player.x = laneCenterX(player.lane);
+      playerTargetX = player.x;
+    }
   }
 
 
@@ -46,33 +60,32 @@
   const CAR_W = 15, CAR_H = 24;
   const TRUCK_W = 22, TRUCK_H = 46;
 
-  let state = 'start'; // Machine tracking status flag: 'start' | 'playing' | 'gameover'
-  let elapsed = 0;
-  let score = 0;
-  let scoreDistanceAcc = 0;
-  let best = 0;
+  let state = 'start'; // Core state machine manager: 'start' | 'playing' | 'gameover'
+  let elapsed = 0; // Tracks total game duration
+  let score = 0; // Holds the current score value
+  let scoreDistanceAcc = 0; // Accumulates ticks to periodically increment score distance
+  let best = 0; // Stores the high score for the session
 
 
   // ---------------------------------------------------------------
   // PLAYER INITIALIZATION PROPERTIES
   // ---------------------------------------------------------------
   let player = {
-    lane: Math.floor(LANES / 2) - 1,
+    lane: 1, // Will be centered dynamically during initial resizeCanvas() call
     x: 0,
     y: PH - 44,
     w: CAR_W,
     h: CAR_H
   };
-  player.x = laneCenterX(player.lane);
-  let playerTargetX = player.x; // Target node coordinates for steering lerps
+  let playerTargetX = player.x; // Destination X coordinate used for smooth lane transitions
 
 
   // ---------------------------------------------------------------
   // TRAFFIC ENGINE VARIABLES
   // ---------------------------------------------------------------
-  let traffic = [];
-  let spawnTimer = 0;
-  let lastSpawnLane = -1;
+  let traffic = []; // Holds active oncoming obstacles
+  let spawnTimer = 0; // Counts down to trigger the next vehicle spawn
+  let lastSpawnLane = -1; // Prevents identical back-to-back lane spawns
 
 
   // ---------------------------------------------------------------
@@ -83,12 +96,23 @@
   const bestEl = document.getElementById('bestVal');
   const leftBtn = document.getElementById('leftBtn');
   const rightBtn = document.getElementById('rightBtn');
+  const gameSection = document.getElementById('gameSection');
+
+
+  // ---------------------------------------------------------------
+  // INITIAL GEOMETRY SETUP
+  // ---------------------------------------------------------------
+  // Run initial dimension calculations
+  resizeCanvas();
+
+  // Re-run calculations dynamically when the user resizes their screen or changes orientation
+  window.addEventListener('resize', resizeCanvas);
 
 
   // ---------------------------------------------------------------
   // USER INTERFACE OVERLAY TOGGLES
   // ---------------------------------------------------------------
-  // Draws the initial start screen layout
+  // Renders the initial start menu layout onto the game screen container
   function showStartOverlay(){
     overlayEl.classList.remove('hidden');
     overlayEl.innerHTML =
@@ -98,7 +122,7 @@
     document.getElementById('playBtn').addEventListener('click', startGame);
   }
 
-  // Draws the crash notification module screen
+  // Renders the game over menu showing final score and potential high scores
   function showGameOverOverlay(){
     overlayEl.classList.remove('hidden');
     overlayEl.innerHTML =
@@ -108,6 +132,7 @@
     document.getElementById('retryBtn').addEventListener('click', startGame);
   }
 
+  // Closes the overlay to make room for active gameplay
   function hideOverlay(){
     overlayEl.classList.add('hidden');
   }
@@ -116,7 +141,7 @@
   // ---------------------------------------------------------------
   // GAME RUNTIME SYSTEMS
   // ---------------------------------------------------------------
-  // Resets game state engines to spawn clean boards
+  // Resets core simulation trackers to spin up a clean match
   function startGame(){
     state = 'playing';
     elapsed = 0;
@@ -130,7 +155,7 @@
     hideOverlay();
   }
 
-  // Halts state updates when collisions are verified
+  // Triggers game over sequence and updates visual score boards upon collision
   function endGame(){
     state = 'gameover';
     if (score > best) best = score;
@@ -142,6 +167,7 @@
   // ---------------------------------------------------------------
   // INTERACTIVE INPUT CONTROLS
   // ---------------------------------------------------------------
+  // Moves the player vehicle one lane to the left, bounded by lane 0
   function moveLeft(){
     if (state !== 'playing') return;
     if (player.lane > 0){
@@ -150,6 +176,7 @@
     }
   }
 
+  // Moves the player vehicle one lane to the right, bounded by the maximum lane count
   function moveRight(){
     if (state !== 'playing') return;
     if (player.lane < LANES - 1){
@@ -158,11 +185,11 @@
     }
   }
 
-  // Hooks touch event triggers onto the HTML controller block
+  // Links on-screen tactile buttons to their responsive functions
   leftBtn.addEventListener('click', moveLeft);
   rightBtn.addEventListener('click', moveRight);
 
-  // Maps keyboard inputs to support desktop navigation alternative paths
+  // Maps keyboard events to standard WASD, Arrow keys, Enter, and Space buttons
   window.addEventListener('keydown', function(e){
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A'){
       e.preventDefault();
@@ -171,6 +198,7 @@
       e.preventDefault();
       moveRight();
     } else if (e.key === ' ' || e.key === 'Enter'){
+      if (gameSection.classList.contains('hidden')) return;
       if (state !== 'playing') startGame();
     }
   }, { passive: false });
@@ -179,7 +207,7 @@
   // ---------------------------------------------------------------
   // TRAFFIC ALGORITHMS & OBJECT GENERATOR
   // ---------------------------------------------------------------
-  // Scans lane matrices to block cars from spawning over each other
+  // Helper utility checks if a safe vertical distance exists in a given lane
   function laneClearAt(lane, y, minGap, excludeCar){
     const targetX = laneCenterX(lane);
     for (const t of traffic){
@@ -191,8 +219,9 @@
     return true;
   }
 
-  // Generates randomized traffic obstacle cars inside safe lane zones
+  // Instantiates new oncoming traffic units into open layout slots
   function spawnCar(){
+    // Spawn trucks instead of cars based on gameplay duration and random chance
     const isTruck = elapsed > 1.5 && Math.random() < 0.22;
     const w = isTruck ? TRUCK_W : CAR_W;
     const h = isTruck ? TRUCK_H : CAR_H;
@@ -200,7 +229,7 @@
     const minGap = h + 22;
 
     let lane = -1;
-    // Builds a randomized search order matching the active dynamic lane allocation count
+    // Generates a randomized search index array to find a viable placement lane
     const order = Array.from({length: LANES}, (_, i) => i).sort(() => Math.random() - 0.5);
     for (const candidate of order){
       if (candidate === lastSpawnLane && order.length > 1) continue;
@@ -214,15 +243,15 @@
         if (laneClearAt(candidate, spawnY, minGap, null)){ lane = candidate; break; }
       }
     }
-    if (lane === -1) return;
+    if (lane === -1) return; // Discards spawn event if road is overly congested
 
     lastSpawnLane = lane;
 
-    // Speeds scale upwards dynamically over time to increase difficulty
+    // Linearly scales vehicle base speeds to ramp difficulty over time
     const difficultySpeed = Math.min(elapsed * 1.6, 45);
     const speed = (isTruck ? 34 : 40) + difficultySpeed + Math.random() * (isTruck ? 14 : 24);
 
-    // AI Aggression Mechanics: decides if this obstacle car will cut into an adjacent lane
+    // AI logic deciding if the vehicle will execute an sudden lane merge
     const willSwerve = !isTruck && elapsed > 2.5 && Math.random() < 0.42;
     let targetLane = lane;
     let swervePointY = 0;
@@ -235,6 +264,7 @@
       swervePointY = -40 - Math.random() * 110;
     }
 
+    // Pushes newly prepared unit object to active rendering registry
     traffic.push({
       kind: isTruck ? 'truck' : 'car',
       lane: lane,
@@ -265,7 +295,7 @@
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
-  const MAX_TILT = 0.30; // Radians to lean the vehicle model when merging lanes
+  const MAX_TILT = 0.30; // Maximum rotation angle applied when vehicles change lanes
 
   function updateBlink(c, dt){
     c.blinkClock += dt;
@@ -275,12 +305,11 @@
     }
   }
 
-  // Updates lane steering matrices and increments Y translation frames
   function updateTraffic(dt){
     for (let i = traffic.length - 1; i >= 0; i--){
       const c = traffic[i];
 
-      // Swerve transition state machine triggers
+      // Lane-changing state transitions
       if (c.state === 'straight' && c.willSwerve && c.y > c.swervePointY){
         c.willSwerve = false;
         if (laneClearAt(c.targetLane, c.y, c.h + 24, c)){
@@ -309,15 +338,13 @@
         }
       }
 
-      c.y += c.speed * dt;
+      c.y += c.speed * dt; // Applies vertical translation velocity
 
-      // Pass detection rewards score adjustments
       if (!c.passed && c.y > player.y){
         c.passed = true;
         score += 5;
       }
 
-      // Garbage collection routine deletes old items that slip past the bottom
       if (c.y > PH + 40){
         traffic.splice(i, 1);
       }
@@ -326,7 +353,6 @@
     resolveTrafficSpacing();
   }
 
-  // Anti-clipping system prevents faster cars from driving through slower cars ahead of them
   function resolveTrafficSpacing(){
     for (let i = 0; i < traffic.length; i++){
       for (let j = i + 1; j < traffic.length; j++){
@@ -368,7 +394,6 @@
   // ---------------------------------------------------------------
   function px(v){ return Math.round(v); }
 
-  // Shifts colors dynamically to draw highlights or shadows
   function shadeColor(color, percent){
     const f = parseInt(color.slice(1), 16);
     const t = percent < 0 ? 0 : 255;
@@ -380,6 +405,7 @@
     return '#' + (0x1000000 + nR * 0x10000 + nG * 0x100 + nB).toString(16).slice(1);
   }
 
+  // Draw Wheels
   function drawWheels(w, h, frontY, rearY){
     ctx.fillStyle = '#1B1C2B';
     const ww = 3, wh = 6;
@@ -389,6 +415,7 @@
     ctx.fillRect(px(w / 2 - 2), px(rearY), ww, wh);
   }
 
+  // Draw Car Body
   function drawCarBody(w, h, bodyColor, windowColor){
     drawWheels(w, h, -h / 2 + h * 0.14, h / 2 - h * 0.14 - 6);
 
@@ -407,6 +434,7 @@
     ctx.fillRect(px(-winW / 2), px(h / 2 - h * 0.32), px(winW), px(h * 0.16));
     ctx.globalAlpha = 1;
 
+    // Headlights (yellow) and tail lights (red)
     ctx.fillStyle = '#FFE9A8';
     ctx.fillRect(px(-w / 2 + 1), px(-h / 2 + 1), 2, 2);
     ctx.fillRect(px(w / 2 - 3), px(-h / 2 + 1), 2, 2);
@@ -415,6 +443,7 @@
     ctx.fillRect(px(w / 2 - 3), px(h / 2 - 3), 2, 2);
   }
 
+  // Draw Truck Body
   function drawTruckBody(w, h){
     const cabH = h * 0.28;
 
@@ -445,19 +474,16 @@
     ctx.fillRect(px(w / 2 - 3), px(h / 2 - 3), 2, 2);
   }
 
-  // Double turn indicator lights rendering (fixes the bug and blinks on both top and bottom corners of the turning side)
   function drawTurnSignal(c){
     if (c.state !== 'signaling' && c.state !== 'changing') return;
     if (!c.blinkOn) return;
     const dir = c.targetLane > c.startLane ? 1 : -1;
     ctx.fillStyle = '#FFC94D';
     
-    // Front turn signal pixel
     const sxTop = px(c.x + dir * (c.w / 2 + 1));
     const syTop = px(c.y - c.h / 2 + 2);
     ctx.fillRect(sxTop, syTop, 2, 2);
 
-    // Rear turn signal pixel
     const sxBottom = px(c.x + dir * (c.w / 2 + 1));
     const syBottom = px(c.y + c.h / 2 - 4);
     ctx.fillRect(sxBottom, syBottom, 2, 2);
@@ -476,12 +502,12 @@
     drawTurnSignal(c);
   }
 
-  // Generates infinite scroll patterns deterministically to prevent per-frame grass flickering
   function hash(n){
     const v = Math.sin(n * 12.9898) * 43758.5453;
     return v - Math.floor(v);
   }
 
+  // Draw Scrolling Grass Shoulder
   function drawGrass(xStart, width){
     ctx.fillStyle = '#6E9142';
     ctx.fillRect(px(xStart), 0, px(width), PH);
@@ -510,13 +536,13 @@
   function render(){
     ctx.clearRect(0, 0, PW, PH);
 
+    // Road asphalt base color
     ctx.fillStyle = '#8D8F95';
     ctx.fillRect(0, 0, PW, PH);
 
     drawGrass(0, SHOULDER);
     drawGrass(PW - SHOULDER, SHOULDER);
 
-    // Draws scrolling canvas dashed highway partition lines recursively
     ctx.strokeStyle = '#F2F0E8';
     ctx.lineWidth = 2;
     ctx.setLineDash([9, 8]);
@@ -528,9 +554,8 @@
       ctx.lineTo(x, PH);
       ctx.stroke();
     }
-    ctx.setLineDash([]);
+    ctx.setLineDash([]); // Clears dash rules so they do not bleed into other assets
 
-    // Renders active traffic vectors
     for (const c of traffic){
       if (c.kind === 'truck'){
         drawVehicle(c);
@@ -540,7 +565,6 @@
       }
     }
 
-    // Draws the main user character vehicle model
     ctx.save();
     ctx.translate(px(player.x), px(player.y));
     drawCarBody(player.w, player.h, '#F5F2E8', '#2B2D45');
@@ -560,7 +584,6 @@
     if (state === 'playing'){
       elapsed += dt;
 
-      // Linear interpolation (lerp) handles smooth user lane swapping animations
       player.x += (playerTargetX - player.x) * Math.min(1, dt * 12);
 
       spawnTimer -= dt;
@@ -574,7 +597,6 @@
       updateTraffic(dt);
       checkCollisions();
 
-      // Updates score values passively as long as the state is active
       scoreDistanceAcc += dt * 10;
       while (scoreDistanceAcc >= 1){
         score += 1;
@@ -582,14 +604,17 @@
       }
       scoreEl.textContent = score;
     } else {
-      elapsed += dt * 0.5; // Smooth ambient background scrolling for the home menus
+      elapsed += dt * 0.5;
     }
 
     render();
     requestAnimationFrame(loop);
   }
 
-  // Boot up structural components
+
+  // ---------------------------------------------------------------
+  // INITIAL STARTUP SEQUENCE
+  // ---------------------------------------------------------------
   showStartOverlay();
   render();
   requestAnimationFrame(loop);
