@@ -1,0 +1,120 @@
+/* ==========================================================================
+   UI
+   Banner, start/game-over overlays, HUD stat pills, footer.
+   ========================================================================== */
+.pixel{ font-family:'Press Start 2P', monospace; } /* Font override helper for high contrast pixel titles */
+
+/* Top header styling panel */
+.banner{
+  background:linear-gradient(180deg, var(--banner-top) 0%, var(--banner-bottom) 100%);
+  padding:12px 18px;
+  border-bottom:3px solid var(--page-bg-dark);
+  flex-shrink: 0; /* Safeguards header boundaries against compression downscaling */
+}
+.banner-small{
+  font-size:11px;
+  color:#EAF2FF;
+  margin:0 0 4px;
+  letter-spacing:.5px;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.2);
+}
+.banner-big{
+  font-size:21px;
+  color:#FFFFFF;
+  margin:0;
+  line-height:1.2;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.25);
+}
+
+/* Full-bleed overlay panels used for menu screens */
+.overlay{
+  position:absolute; inset:0;
+  background:rgba(30,30,50,0.78); /* Semi-transparent dimming filter */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:18px;
+  color:#fff;
+  transition:opacity .2s ease;
+  z-index: 10; /* Keeps overlay positioned reliably on top of active gameplay canvas streams */
+}
+.overlay.hidden{ opacity:0; pointer-events:none; } /* Completely blocks click interactions when hidden */
+
+.overlay h2{
+  font-family:'Press Start 2P',monospace;
+  margin:0 0 10px;
+  font-size:15px;
+  line-height:1.5;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.3);
+}
+.overlay p{
+  margin:0 0 16px;
+  font-size:16px;
+  color:#E4E6F2;
+  max-width:260px;
+  line-height:1.4;
+  font-family:'VT323',monospace;
+}
+
+/* Verification interaction CTA button */
+.verify-btn{
+  font-family:'Press Start 2P',monospace;
+  font-size:11px;
+  color:#fff;
+  background:var(--banner-bottom);
+  border:none;
+  border-bottom:4px solid var(--banner-bottom-dark); /* Fakes faux retro 3D button elevations */
+  padding:12px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:transform .08s ease;
+}
+/* Translates positions downward slightly when clicked to emulate a physical button compression click */
+.verify-btn:active{ transform:translateY(3px); border-bottom-width:1px; }
+
+/* Dashboard scoring analytics container layout row */
+.stats-row{
+  display:flex;
+  gap:10px;
+  flex-shrink: 0;
+}
+.stat{
+  flex:1 1 0;
+  background:#FFFDF8;
+  border:2px solid var(--card-edge);
+  border-radius:8px;
+  padding:4px 10px;
+  text-align:center;
+}
+.stat-label{
+  display:block;
+  font-family:'Press Start 2P',monospace;
+  font-size:8px;
+  letter-spacing:.5px;
+  color:var(--ink-soft);
+  margin-bottom:2px;
+}
+.stat-value{
+  display:block;
+  font-family:'Press Start 2P',monospace;
+  font-size:14px;
+  color:var(--ink);
+}
+
+/* Captcha signature text footer decoration */
+.captcha-footer{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2px 4px 0;
+  flex-shrink: 0;
+}
+.footer-fine{
+  font-family:'VT323',monospace;
+  font-size:14px;
+  color:#96917E;
+  text-align:center;
+  line-height:1.25;
+}

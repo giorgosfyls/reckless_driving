@@ -1,0 +1,59 @@
+/* ==========================================================================
+   LAYOUT
+   Structural positioning only: page centering, the card shell and the
+   flex column that stacks road / HUD / controls / footer.
+   ========================================================================== */
+*{ box-sizing:border-box; } /* Enforce explicit padding calculations across all layout components */
+
+html, body{
+  height:100%;
+}
+
+body{
+  margin:0;
+  min-height:100dvh; /* Adapts dynamically to account for browser mobile navigation panel layouts */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at 25% 10%, var(--page-bg) 0%, var(--page-bg-dark) 75%);
+  font-family:'VT323', monospace; /* Default system font assignment */
+  color:var(--ink);
+}
+
+/* Master wrapper encapsulating the CAPTCHA module mock configuration */
+.captcha-card{
+  width: var(--card-w);
+  height: var(--card-h);
+  max-width: 100%;
+  max-height: 100dvh;
+  background: var(--card-bg);
+  border: none;
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Clips contents clean to protect corners */
+}
+
+/* Internal body panel tracking flex distribution setups */
+.card-body{
+  padding: 10px;
+  flex: 1;
+  min-height: 0; /* Important fallback rule allowing flex containers to scale beneath canvas proportions */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Canvas viewing viewport box wrapper. Sets relative context lines for the modal menus */
+.road-wrap{
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid var(--card-edge);
+  outline: 3px solid var(--page-bg-dark);
+  outline-offset: 0;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}

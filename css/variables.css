@@ -1,0 +1,52 @@
+/* ==========================================================================
+   DESIGN TOKENS
+   Shared color, radius and sizing tokens used across every CSS module.
+   ========================================================================== */
+:root{
+  /* Page background colors */
+  --page-bg:#3C3E72;
+  --page-bg-dark:#2A2C52;
+
+  /* Card enclosure block tokens */
+  --card-bg:#EDEAE0;
+  --card-edge:#D8D3C2;
+  --radius:14px;
+
+  /* Header banner styling colors */
+  --banner-top:#78B0FF;
+  --banner-bottom:#2E6FE0;
+  --banner-bottom-dark:#1E4FA8;
+
+  /* Canvas track road asset color representations */
+  --asphalt:#8D8F95;
+  --asphalt-edge:#7A7C82;
+  --lane-line:#F2F0E8;
+  --grass:#6E9142;
+  --grass-dark:#557331;
+  --grass-light:#86AE55;
+
+  /* Vehicle color representation matrices */
+  --red-car:#D64B3F;
+  --red-car-dark:#A1332A;
+  --truck-cab:#C23B32;
+  --truck-trailer:#F2EEE2;
+  --player-car:#F5F2E8;
+  --player-car-dark:#C9C4B2;
+  --window:#2B2D45;
+
+  /* UI feedback tracking indicators */
+  --ink:#2A2C40;
+  --ink-soft:#6A6C86;
+  --warn:#FFC94D;
+  --danger:#D6453F;
+  --success:#5AA463;
+
+  /* Sizing fallback defaults; redefined dynamically within responsive.css */
+  --card-w: 100vw;
+  --card-h: 100dvh;
+  --card-radius: 0px;
+
+  /* Button control sizing metrics */
+  --btn-size: 60px;
+  --btn-gap: 26px;
+}

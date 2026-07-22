@@ -1,0 +1,20 @@
+/* ==========================================================================
+   GAME CANVAS
+   The canvas is taken out of flow with absolute positioning so its
+   internal resolution can never influence the size of .road-wrap
+   (avoids a circular flex/percentage sizing bug). image-rendering keeps
+   the fixed 220x320 internal resolution crisp at any scale.
+   ========================================================================== */
+canvas#game{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none; /* Prevents default viewport gestures or rubberband drag behaviors from interfering with inputs */
+  
+  /* Disables canvas anti-aliasing interpolation filters to preserve razor-sharp pixel edge rendering profiles */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}

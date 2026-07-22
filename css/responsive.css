@@ -1,0 +1,61 @@
+/* ==========================================================================
+   RESPONSIVE
+   Mobile-first. Below 600px the card is a full-bleed app. From 600px up
+   it becomes a fixed-aspect boxed widget that simply scales up with the
+   viewport, so the canvas is always stretched by the same ratio.
+   ========================================================================== */
+
+/* ---- phones (default smartphone views / dimensions < 600px) ----------- */
+:root {
+  --card-w: 100vw;
+  --card-h: 100dvh; /* Enforces absolute full-screen coverage across standard pocket devices */
+  --card-radius: 0px;
+  --btn-size: 60px;
+  --btn-gap: 100px; /* Reduced gap to keep buttons easily reachable on phone screens */
+}
+
+/* ---- small tablets: 600px – 767px ------------------------------------ */
+@media (min-width: 600px) {
+  :root {
+    --card-w: min(92vw, 460px);
+    --card-h: min(90dvh, 756px); /* Wraps game window into an isolated modular card dashboard floating layout */
+    --card-radius: 18px;
+    --btn-size: 62px;
+    --btn-gap: 50px; /* Slightly increased but highly reachable gap for small tablets */
+  }
+  body { padding: 20px 12px; }
+  .captcha-card {
+    border: 4px solid var(--page-bg-dark);
+    box-shadow: 0 10px 0 rgba(0,0,0,0.18), 0 20px 40px -14px rgba(0,0,0,0.45); /* Gives retro depth styling */
+  }
+}
+
+/* ---- tablets: 768px – 1023px ------------------------------------------ */
+@media (min-width: 768px) {
+  :root {
+    --card-w: 440px;
+    --card-h: 720px;
+    --btn-size: 60px;
+    --btn-gap: 55px; /* Balanced spacing to prevent thumb strain on standard tablet widths */
+  }
+}
+
+/* ---- laptops: 1024px – 1439px ------------------------------------------ */
+@media (min-width: 1024px) {
+  :root {
+    --card-w: 480px;
+    --card-h: 790px;
+    --btn-size: 64px;
+    --btn-gap: 60px; /* Comfortable medium-width gap tailored for larger window resolutions */
+  }
+}
+
+/* ---- desktop monitors: 1440px – 1919px --------------------------------- */
+@media (min-width: 1440px) {
+  :root {
+    --card-w: 520px;
+    --card-h: 860px;
+    --btn-size: 68px;
+    --btn-gap: 70px; /* Maximum clean spacing configured for extra-large monitor scales */
+  }
+}

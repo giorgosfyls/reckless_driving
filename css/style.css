@@ -1,0 +1,10 @@
+/* ==========================================================================
+   DriveCheck v2.0 — stylesheet entry point.
+   Imports every CSS module in the order it should cascade.
+   ========================================================================== */
+@import url("variables.css");  /* Setup global design tokens and layout dimensions */
+@import url("layout.css");     /* Structural rules and core card wrappers */
+@import url("ui.css");         /* Typography styles, status blocks, text containers */
+@import url("controls.css");   /* Stylings for mobile navigation steering buttons */
+@import url("game.css");       /* Canvas optimization properties and filters */
+@import url("responsive.css"); /* Responsive media break configurations */

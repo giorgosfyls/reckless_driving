@@ -2,72 +2,77 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!-- Disables viewport downscaling gestures to safeguard custom button layout responsiveness -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>DriveCheck &mdash; Steer and Don't Crash</title>
-<link rel="stylesheet" href="style.css">
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg \
-xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect \
-width='32' height='32' rx='6' fill='%233C3E72'/%3E%3Crect x='11' \
-y='4' width='10' height='22' rx='2' fill='%23D64B3F'/%3E%3Crect \
-x='12.5' y='7' width='7' height='6' fill='%232B2D45'/%3E%3Crect \
-x='12.5' y='19' width='7' height='4' fill='%232B2D45' \
-opacity='0.8'/%3E%3Crect x='9' y='9' width='2' height='4' \
-fill='%231B1C2B'/%3E%3Crect x='21' y='9' width='2' height='4' \
-fill='%231B1C2B'/%3E%3Crect x='9' y='19' width='2' height='4' \
-fill='%231B1C2B'/%3E%3Crect x='21' y='19' width='2' height='4' \
-fill='%231B1C2B'/%3E%3C/svg%3E">
+<!-- Master style bundle linking loader pipeline cascade sheet -->
+<link rel="stylesheet" href="css/style.css">
 
+<!-- Pixel-art inline data-URI vector icon representing mini car silhouette configurations -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233C3E72'/%3E%3Crect x='11' y='4' width='10' height='22' rx='2' fill='%23D64B3F'/%3E%3Crect x='12.5' y='7' width='7' height='6' fill='%232B2D45'/%3E%3Crect x='12.5' y='19' width='7' height='4' fill='%232B2D45' opacity='0.8'/%3E%3Crect x='9' y='9' width='2' height='4' fill='%231B1C2B'/%3E%3Crect x='21' y='9' width='2' height='4' fill='%231B1C2B'/%3E%3Crect x='9' y='19' width='2' height='4' fill='%231B1C2B'/%3E%3Crect x='21' y='19' width='2' height='4' fill='%231B1C2B'/%3E%3C/svg%3E">
+
+<!-- Establish external asset font connection hooks linking Google Web Fonts repository structures -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<!-- Primary floating widget envelope simulation block container -->
 <div class="captcha-card">
-  
+
+  <!-- Top headline title header banner assembly -->
   <div class="banner">
-    <p class="banner-small pixel" id="bannerSubtitle">Steer the car and</p>
-    <p class="banner-big pixel" id="bannerTitle">don't crash</p>
+    <p class="banner-small pixel">Steer the car and</p>
+    <p class="banner-big pixel">don't crash</p>
   </div>
 
+  <!-- Internal interface operations panel container -->
   <div class="card-body">
 
-    <div class="game-container" id="gameSection">
-      <div class="road-wrap">
-        <canvas id="game"></canvas>
-        <div class="overlay" id="overlay"></div>
+    <!-- HUD performance analytics score tracking pill modules -->
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-label">Distance</span>
+        <span class="stat-value" id="scoreVal">0</span>
       </div>
-
-      <div class="stats-row">
-        <div class="stat">
-          <span class="stat-label">Distance</span>
-          <span class="stat-value" id="scoreVal">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Best</span>
-          <span class="stat-value" id="bestVal">0</span>
-        </div>
-      </div>
-
-      <div class="controls-track">
-        <button class="arrow-btn" id="leftBtn" aria-label="Move left">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="arrow-btn" id="rightBtn" aria-label="Move right">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+      <div class="stat">
+        <span class="stat-label">Best</span>
+        <span class="stat-value" id="bestVal">0</span>
       </div>
     </div>
 
+    <!-- Gameplay window viewport wrapper container -->
+    <div class="road-wrap">
+      <!-- Rendering context target canvas tag frame destination -->
+      <canvas id="game"></canvas>
+      <!-- Overlapping absolute status menu modal popup element nodes -->
+      <div class="overlay" id="overlay"></div>
+    </div>
+
+    <!-- On-screen thumb button steering navigational tracks layout block -->
+    <div class="controls-track">
+      <button class="arrow-btn" id="leftBtn" aria-label="Move left">
+        <!-- Horizontal vector arrow direction icon design assets -->
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="arrow-btn" id="rightBtn" aria-label="Move right">
+        <!-- Horizontal vector arrow direction icon design assets -->
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Footer verification slogan credit placeholder -->
     <div class="captcha-footer">
-      <span class="footer-fine" id="footerText">Prove you're reckless, not a bot</span>
+      <span class="footer-fine">Prove you're reckless, not a bot</span>
     </div>
 
   </div>
 </div>
 
-<script src="script.js"></script>
+<!-- Launch master program initialization execution modules script entry -->
+<script type="module" src="js/main.js"></script>
 
 </body>
 </html>

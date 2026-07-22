@@ -1,0 +1,38 @@
+/* ==========================================================================
+   CONTROLS
+   On-screen steering buttons — sized and spaced for thumbs, scales via
+   the --btn-size / --btn-gap tokens set per breakpoint in responsive.css.
+   ========================================================================== */
+.controls-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  flex-shrink: 0;
+  padding: 8px 24px; /* Added horizontal padding to prevent buttons from hugging the outer screen bezel */
+}
+
+/* Round navigation layout control dials optimized for mobile screen touch targets */
+.arrow-btn{
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius:50%;
+  border:none;
+  border-bottom:5px solid var(--banner-bottom-dark); /* 3D tactile edge styling effects */
+  background:var(--banner-bottom);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent; /* Removes ugly bright blue select box highlights on webkit devices */
+  transition:transform .08s ease;
+  flex:0 0 auto;
+  touch-action: manipulation; /* Disables double-tap zooming overhead delays on mobile browsers */
+}
+.arrow-btn svg{
+  width: 42%;
+  height: 42%;
+}
+/* Flattens 3D shadow depths instantly when pressed down to simulate physical compression responses */
+.arrow-btn:active{ transform:translateY(3px); border-bottom-width:2px; }
